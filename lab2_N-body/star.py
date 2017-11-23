@@ -53,3 +53,23 @@ class Star:
     @staticmethod
     def generate(n):
         return [Star._generate() for _ in range(n)]
+
+
+class GravityCalculator:
+    G = 6.67408e-11     # m^3 / (kg * s^2)
+
+    @staticmethod
+    def calculate(star1, star2):
+        if star1.position != star2.position:
+            delta = star1.position - star2.position
+            return (GravityCalculator.G * star1.mass * star2.mass / abs(delta) ** 3) * delta
+        else:
+            return Force(0, 0, 0)
+
+    @staticmethod
+    def calculate_constellation(constellation):
+        for i in range(len(constellation) - 1):
+            for j in range(i + 1, len(constellation)):
+                gravity = GravityCalculator.calculate(constellation[i], constellation[j])
+                constellation[i].force += gravity
+                constellation[j].force -= gravity
