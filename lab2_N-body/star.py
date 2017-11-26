@@ -17,6 +17,9 @@ class Vector3D:
     def __mul__(self, scalar):
         return Vector3D(scalar * self.x, scalar * self.y, scalar * self.z)
 
+    def __truediv__(self, scalar):
+        return Vector3D(self.x / scalar, self.y / scalar, self.z / scalar)
+
     def __rmul__(self, scalar):
         return self * scalar
 
@@ -25,6 +28,9 @@ class Vector3D:
 
     def __eq__(self, other):
         return abs(self - other) < 0.001
+
+    def __repr__(self):
+        return self.__class__.__name__ + "(" + str(self.x) + ", " + str(self.y) + ", " + str(self.z) + ")"
 
 
 Position = Vector3D
@@ -39,15 +45,23 @@ class Star:
         self.position = position
         self.velocity = velocity
         self.force = Force(0, 0, 0)
+        self.prev_force = Force(0, 0, 0)
 
-    def reset(self):
+    def update_position(self, dt):
+        self.position += self.velocity * dt + self.force * dt ** 2 / (2 * self.mass)
+
+    def update_velocity(self, dt):
+        self.velocity += (self.prev_force + self.force) * dt / (2 * self.mass)
+
+    def reset_force(self):
+        self.prev_force = self.force
         self.force = Force(0, 0, 0)
 
     @staticmethod
     def _generate():
-        mass = randint(5000, 100000)    # 1e27kg
-        position = Position(randint(0, 50000), randint(0, 50000), randint(0, 1000))     # light years ~= 9.4e15m
-        velocity = Velocity(randint(0, 100), randint(0, 100), randint(0, 100))      # km/s
+        mass = randint(5000, 100000) * 1e27   # kg
+        position = Position(randint(0, 50000), randint(0, 50000), randint(0, 1000)) * 9.46e15     # m    ##light year ~= 9.46e15m
+        velocity = Velocity(randint(0, 100), randint(0, 100), randint(0, 100)) * 1e3     # m/s
         return Star(mass, position, velocity)
 
     @staticmethod

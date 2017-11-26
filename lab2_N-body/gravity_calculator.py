@@ -5,23 +5,23 @@ import sys
 
 
 class GravityCalculator:
-    def __init__(self, N):
+    def __init__(self, processes, constellation):
         self.commutator = MPI.COMM_WORLD
         self.rank = self.commutator.rank
-        self.processes = min(self.commutator.size, N)
+        self.processes = processes
 
         self.left_neighbour = (self.rank - 1) % self.processes
         self.right_neighbour = (self.rank + 1) % self.processes
 
-        self.size = N // self.processes + int(self.rank < N % self.processes)
-        self.constellation = Star.generate(self.size)
+        self.size = len(constellation)
+        self.constellation = constellation
 
     @staticmethod
     def calculate_star(star1, star2):
         G = 6.67408e-11  # m^3 / (kg * s^2)
 
         if star1.position != star2.position:
-            delta = star1.position - star2.position
+            delta = star2.position - star1.position
             return (G * star1.mass * star2.mass / abs(delta) ** 3) * delta
         else:
             return Force(0, 0, 0)
@@ -51,8 +51,6 @@ class AsymmetricGravityCalculator(GravityCalculator):
 
         self.calculate_constellation()
 
-        print(self.rank, abs(self.constellation[-1].force))
-
 
 class SymmetricGravityCalculator(GravityCalculator):
 
@@ -81,18 +79,3 @@ class SymmetricGravityCalculator(GravityCalculator):
                 self.constellation[i].force += accumulator[i].force
 
         self.calculate_constellation()
-
-        print(self.rank, abs(self.constellation[-1].force))
-
-
-if __name__ == "__main__":
-    random.seed(9692 + MPI.COMM_WORLD.rank)
-
-    N = int(sys.argv[1]) if len(sys.argv) > 1 else 31
-
-    if sys.argv[2] == "asym":
-        gc = AsymmetricGravityCalculator(N)
-    else:
-        gc = SymmetricGravityCalculator(N)
-
-    gc.calculate()
