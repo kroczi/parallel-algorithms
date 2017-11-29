@@ -5,7 +5,7 @@ import random
 import sys
 
 
-random.seed(9692 + MPI.COMM_WORLD.rank)
+#random.seed(9692 + MPI.COMM_WORLD.rank)
 
 N = int(sys.argv[1]) if len(sys.argv) > 1 else 31
 TYPE = int(sys.argv[2]) if len(sys.argv) > 2 else 0
