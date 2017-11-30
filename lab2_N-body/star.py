@@ -40,7 +40,8 @@ Force = Vector3D
 
 
 class Star:
-    def __init__(self, mass, position, velocity):
+    def __init__(self, mass, position, velocity, name="star"):
+        self.name = name
         self.mass = mass
         self.position = position
         self.velocity = velocity

@@ -62,10 +62,10 @@ class SymmetricGravityCalculator(GravityCalculator):
             # self.commutator.isend(accumulator, dest=self.right_neighbour, tag=2 * it + 1)
             # buffer = self.commutator.recv(source=self.left_neighbour, tag=2 * it)
             # accumulator = self.commutator.recv(source=self.left_neighbour, tag=2 * it + 1)
-            buffer = self.commutator.sendrecv(buffer, self.right_neighbour, 2 * it,
-                                              None, self.left_neighbour, 2 * it)
-            accumulator = self.commutator.sendrecv(accumulator, self.right_neighbour, 2 * it + 1,
-                                                   None, self.left_neighbour, 2 * it + 1)
+            (buffer, accumulator) = self.commutator.sendrecv((buffer, accumulator), self.right_neighbour, 2 * it,
+                                                             None, self.left_neighbour, 2 * it)
+            # accumulator = self.commutator.sendrecv(accumulator, self.right_neighbour, 2 * it + 1,
+            #                                        None, self.left_neighbour, 2 * it + 1)
 
             for i in range(self.size):
                 for j in range(len(buffer)):
@@ -78,7 +78,7 @@ class SymmetricGravityCalculator(GravityCalculator):
             # self.commutator.isend(accumulator, dest=(self.rank - iterations) % self.processes, tag=2 * iterations)
             # accumulator = self.commutator.recv(source=(self.rank + iterations) % self.processes, tag=2 * iterations)
             accumulator = self.commutator.sendrecv(accumulator, (self.rank - iterations) % self.processes, 2 * iterations,
-                                                   None, (self.rank - iterations) % self.processes, 2 * iterations)
+                                                   None, (self.rank + iterations) % self.processes, 2 * iterations)
 
             for i in range(self.size):
                 self.constellation[i].force += accumulator[i].force
