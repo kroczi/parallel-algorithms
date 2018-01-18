@@ -104,3 +104,6 @@ ENV/
 .idea/
 *.iml
 *.png
+
+# TXT files
+*.txt
